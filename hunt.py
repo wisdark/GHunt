@@ -50,7 +50,7 @@ data = json.loads(req.text)
 if not "matches" in data:
     exit("[-] This email address does not belong to a Google Account.")
 
-# print(data)
+#print(data)
 geolocator = Nominatim(user_agent="nominatim")
 print(f"[+] {len(data['matches'])} account found !")
 
