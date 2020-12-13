@@ -14,7 +14,7 @@ from seleniumwire import webdriver
 from lib.utils import *
 
 
-def scrape(gaiaID, client, cookies, cfg):
+def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headless):
     def get_datetime(datepublished):
         if datepublished.split()[0] == "a":
             nb = 1
@@ -50,10 +50,10 @@ def scrape(gaiaID, client, cookies, cfg):
 
     if "/maps/reviews/data" not in data:
         tmprinter.out("")
-        print("=> No reviews")
+        print("[-] No reviews")
         return False
 
-    chrome_options = get_chrome_options_args(cfg)
+    chrome_options = get_chrome_options_args(is_headless)
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
     }
@@ -61,11 +61,15 @@ def scrape(gaiaID, client, cookies, cfg):
     tmprinter.out("Starting browser...")
 
     driverpath = get_driverpath()
-    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
+    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, chrome_options=chrome_options)
+    driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
     tmprinter.out("Setting cookies...")
     driver.get("https://www.google.com/robots.txt")
+    
+    if not config.gmaps_cookies:
+        cookies = {"CONSENT": config.default_consent_cookie}
     for k, v in cookies.items():
         driver.add_cookie({'name': k, 'value': v})
 
@@ -81,7 +85,7 @@ def scrape(gaiaID, client, cookies, cfg):
     else:
         return False
 
-    print(f"=> {scroll_max} reviews found !             ")
+    print(f"[+] {scroll_max} reviews found !             ")
 
     timeout = scroll_max * 1.25
     timeout_start = time.time()
@@ -107,7 +111,7 @@ def scrape(gaiaID, client, cookies, cfg):
     reviews = []
     for nb, review in enumerate(reviews_elements):
         id = review.get_attribute("data-review-id")
-        location = re.compile(cfg["regexs"]["review_loc_by_id"].format(id)).findall(data)[0]
+        location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
         date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
         reviews.append({"location": location, "date": date})
         tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
@@ -144,10 +148,10 @@ def translate_confidence(percents):
         return "Extremely low"
 
 
-def get_confidence(data, cfg):
+def get_confidence(data, gmaps_radius):
     geolocator = Nominatim(user_agent="nominatim")
     tmprinter = TMPrinter()
-    radius = cfg["gmaps_radius"]
+    radius = gmaps_radius
 
     locations = {}
     tmprinter.out(f"Calculation of the distance of each review...")
