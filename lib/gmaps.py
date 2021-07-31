@@ -79,13 +79,14 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
     scrollbox = driver.find_element_by_css_selector('div.section-scrollbox')
 
-    tab_info = driver.find_elements_by_css_selector('div.section-tab-info')
+    tab_info = scrollbox.find_element_by_tag_name("div")
     if tab_info:
-        scroll_max = sum([int(x) for x in tab_info[0].text.split() if x.isdigit()])
+        scroll_max = sum([int(x) for x in tab_info.text.split() if x.isdigit()])
     else:
         return False
 
-    print(f"[+] {scroll_max} reviews found !             ")
+    tmprinter.clear()
+    print(f"[+] {scroll_max} reviews found !")
 
     timeout = scroll_max * 1.25
     timeout_start = time.time()
@@ -109,13 +110,23 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
 
     tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
     reviews = []
+    rating = 0
     for nb, review in enumerate(reviews_elements):
         id = review.get_attribute("data-review-id")
         location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
-        date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
+        try:
+            stars = review.find_element_by_css_selector('span[aria-label$="stars "]')
+        except Exception:
+            stars = review.find_element_by_css_selector('span[aria-label$="star "]')
+        rating += int(stars.get_attribute("aria-label").strip().split()[0])
+        date = get_datetime(stars.find_element_by_xpath("following-sibling::span").text)
         reviews.append({"location": location, "date": date})
         tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
 
+    rating_avg = rating / len(reviews)
+    tmprinter.clear()
+    print(f"[+] Average rating : {int(rating_avg) if int(rating_avg) / round(rating_avg, 1) == 1 else round(rating_avg, 1)}/5 stars !")
+    # 4.9 => 4.9, 5.0 => 5, we don't show the 0
     return reviews
 
 
@@ -148,8 +159,7 @@ def translate_confidence(percents):
         return "Extremely low"
 
 
-def get_confidence(data, gmaps_radius):
-    geolocator = Nominatim(user_agent="nominatim")
+def get_confidence(geolocator, data, gmaps_radius):
     tmprinter = TMPrinter()
     radius = gmaps_radius
 
