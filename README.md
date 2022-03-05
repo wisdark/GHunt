@@ -1,11 +1,16 @@
 ![screenshot](https://files.catbox.moe/8a5nzs.png)
 
-![Python minimum version](https://img.shields.io/badge/Python-3.7%2B-brightgreen)
+![Python minimum version](https://img.shields.io/badge/Python-3.8%2B-brightgreen)
 
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
 GHunt is a modulable OSINT tool designed to evolve over the years, and incorporates many techniques to investigate Google accounts, or objects.\
 It currently has **email**, **document**, **youtube** and **gaia** modules.
+
+🔥 **_GHunt is being completely refactored_**, to allow use as a Python library, removing Selenium and Google Chrome dependencies, using definition types and async, to prepare for v2.\
+You can track the progress on this project here: https://github.com/mxrch/GHunt/projects/1 \
+And on this branch : https://github.com/mxrch/GHunt/tree/refactor \
+Please understand that the activity of the master branch will now be reduced, and therefore the pull requests too.
 
 ## What can GHunt find ?
 
@@ -21,6 +26,10 @@ It currently has **email**, **document**, **youtube** and **gaia** modules.
 - Google Maps reviews (M)
 - Possible physical location (M)
 - Events from Google Calendar (C)
+- Organizations (work & education) (A)
+- Contact emails (A)
+- Contact phones (A)
+- Addresses (A)
 - ~~Public photos (P)~~
 - ~~Phones models (P)~~
 - ~~Phones firmwares (P)~~
@@ -52,13 +61,19 @@ It currently has **email**, **document**, **youtube** and **gaia** modules.
 - Possible other usernames
 - Google Maps reviews (M)
 - Possible physical location (M)
+- Organizations (work & education) (A)
+- Contact emails (A)
+- Contact phones (A)
+- Addresses (A)
 
 The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
 
 Those marked with a **(M)** require the Google Maps reviews of the target to be public (they are by default).
 
-Those marked with a **(C)** requires user to have Google Calendar set on public (default it is closed) 
+Those marked with a **(C)** require user to have Google Calendar set on public (default it is closed).
+
+Those marked with a **(A)** require user to have the additional info set [on profile](https://myaccount.google.com/profile) with privacy option "Anyone" enabled.
 
 # Screenshots
 <p align="center">
@@ -77,7 +92,7 @@ It requires the "Profile photos" album to be public (it is by default)
 # Installation
 
 ## Manual installation
-- Make sure you have Python 3.7+ installed. (I developed it with Python 3.8.1)
+- Make sure you have Python 3.8+ installed. (I developed it with Python 3.8.1)
 - Some Python modules are required which are contained in `requirements.txt` and will be installed below.
 
 ### 1. Chromedriver & Google Chrome
@@ -103,15 +118,14 @@ The Docker image is automatically built and pushed to Dockerhub after each push 
 You can pull the Docker image with:
 
 ```
-docker pull mxrch/ghunt
+docker pull ghcr.io/mxrch/ghunt
 ```
 
-Then, any of the scripts can be invoked through:
+Then, you can use the `docker_check_and_gen.sh` and `docker_hunt.sh` to invoke GHunt through Docker, or you can use these commands :
 
 ```
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py email <email_address>
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py doc <document_link>
+docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt check_and_gen.py
+docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt ghunt.py
 ```
 
 # Usage
