@@ -1,17 +1,17 @@
 import imagehash
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-from seleniumwire.webdriver import Chrome
 
 from lib.os_detect import Os
 
 from pathlib import Path
 import shutil
-import subprocess, os
 from os.path import isfile
 import json
 import re
 from pprint import pprint
+from time import time
+import hashlib
 
 
 class TMPrinter():
@@ -203,7 +203,7 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    driver_path = shutil.which("chromedriver")
+    driver_path = shutil.which("chromedriver") or shutil.which("chromium.chromedriver")
     if driver_path:
         return driver_path
     if within_docker():
@@ -211,24 +211,16 @@ def get_driverpath():
     else:
         chromedrivermanager_silent = ChromeDriverManager(print_first_line=False, log_level=0)
     driver = chromedrivermanager_silent.driver
-    driverpath_with_version = chromedrivermanager_silent.driver_cache.find_driver(driver.browser_version, driver.get_name(), driver.get_os_type(), driver.get_version())
-    driverpath_without_version = chromedrivermanager_silent.driver_cache.find_driver("", driver.get_name(), driver.get_os_type(), "")
-    if driverpath_with_version:
-        return driverpath_with_version
-    elif not driverpath_with_version and driverpath_without_version:
+    driverpath = chromedrivermanager_silent.driver_cache.find_driver(driver)
+    if driverpath:
+        return driverpath
+    else:
         print("[Webdrivers Manager] I'm updating the chromedriver...")
         if within_docker():
             driver_path = ChromeDriverManager(path="/usr/src/app").install()
         else:
             driver_path = ChromeDriverManager().install()
         print("[Webdrivers Manager] The chromedriver has been updated !\n")
-    else:
-        print("[Webdrivers Manager] I can't find the chromedriver, so I'm downloading and installing it for you...")
-        if within_docker():
-            driver_path = ChromeDriverManager(path="/usr/src/app").install()
-        else:
-            driver_path = ChromeDriverManager().install()
-        print("[Webdrivers Manager] The chromedriver has been installed !\n")
     return driver_path
 
 
@@ -255,3 +247,6 @@ def inject_osid(cookies, service, config):
 
     cookies["OSID"] = out["osids"][service]
     return cookies
+
+def gen_sapisidhash(sapisid: str, origin: str, timestamp: str = str(int(time()))) -> str:
+    return f"{timestamp}_{hashlib.sha1(' '.join([timestamp, sapisid, origin]).encode()).hexdigest()}"
