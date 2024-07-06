@@ -7,7 +7,7 @@ import base64
 
 from autoslot import Slots
 
-from ghunt import globals as gb
+from ghunt.errors import GHuntInvalidSession
 
 
 class SmartObj(Slots):
@@ -54,14 +54,15 @@ class GHuntCreds(SmartObj):
                 self.android.master_token = data["android"]["master_token"]
                 self.android.authorization_tokens = data["android"]["authorization_tokens"]
 
-                if not silent:
-                    gb.rc.print("[+] Authenticated !", style="sea_green3")
             except Exception:
-                if not silent:
-                    print("[-] Stored cookies are corrupted\n")
+                raise GHuntInvalidSession("Stored session is corrupted.")
         else:
-            if not silent:
-                print("[-] No stored cookies found\n")
+            raise GHuntInvalidSession("No stored session found.")
+        
+        if not self.are_creds_loaded():
+            raise GHuntInvalidSession("Stored session is incomplete.")
+        if not silent:
+            print("[+] Stored session loaded !")
 
     def save_creds(self, silent=False):
         """Save cookies, OSIDs and tokens to the specified file."""
@@ -87,12 +88,6 @@ class Position(SmartObj):
         self.latitude: float = 0.0
         self.longitude: float = 0.0
 
-class MapsGuidedAnswer(SmartObj):
-    def __init__(self):
-        self.id: str = ""
-        self.question: str = ""
-        self.answer: str = ""
-
 class MapsLocation(SmartObj):
     def __init__(self):
         self.id: str = ""
@@ -101,7 +96,7 @@ class MapsLocation(SmartObj):
         self.position: Position = Position()
         self.tags: List[str] = []
         self.types: List[str] = []
-        self.cost: int = 0 # 1-4
+        self.cost_level: int = 0 # 1-4
 
 class MapsReview(SmartObj):
     def __init__(self):
@@ -109,16 +104,14 @@ class MapsReview(SmartObj):
         self.comment: str = ""
         self.rating: int = 0
         self.location: MapsLocation = MapsLocation()
-        self.guided_answers: List[MapsGuidedAnswer] = []
-        self.approximative_date: relativedelta = None
+        self.date: datetime = None
 
 class MapsPhoto(SmartObj):
     def __init__(self):
         self.id: str = ""
         self.url: str = ""
         self.location: MapsLocation = MapsLocation()
-        self.approximative_date: relativedelta = None
-        self.exact_date: datetime = None
+        self.date: datetime = None
 
 ### Drive
 class DriveExtractedUser(SmartObj):

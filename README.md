@@ -2,6 +2,10 @@
 
 <br>
 
+#### 🌐 GHunt Online version : https://osint.industries
+
+<br>
+
 ![Python minimum version](https://img.shields.io/badge/Python-3.10%2B-brightgreen)
 
 # 😊 Description
@@ -53,20 +57,21 @@ The extension is available on the following stores :\
 
 Then, profit :
 ```bash
-usage: ghunt [-h] {login,email,gaia,drive} ...
+Usage: ghunt [-h] {login,email,gaia,drive,geolocate} ...
 
-positional arguments:
-  {login,email,gaia,drive}
-    login   (--clean)         Authenticate GHunt to Google.
-    email   (--json)          Get information on an email address.
-    gaia    (--json)          Get information on a Gaia ID.
-    drive   (--json)          Get information on a Drive file or folder.
+Positional Arguments:
+  {login,email,gaia,drive,geolocate}
+    login               Authenticate GHunt to Google.
+    email               Get information on an email address.
+    gaia                Get information on a Gaia ID.
+    drive               Get information on a Drive file or folder.
+    geolocate           Geolocate a BSSID.
 
-options:
+Options:
   -h, --help            show this help message and exit
 ```
 
-📄 You can also use --json with email, gaia and drive modules to export in JSON ! Example :
+📄 You can also use --json with email, gaia, drive and geolocate modules to export in JSON ! Example :
 
 ```bash
 $ ghunt email <email_address> --json user_data.json
@@ -109,7 +114,7 @@ This project is under [AGPL Licence](https://choosealicense.com/licenses/agpl-3.
 
 Thanks to these awesome people for supporting me !
 
-<!-- sponsors --><a href="https://github.com/elweth-sec"><img src="https://github.com/elweth-sec.png" width="50px" alt="elweth-sec" /></a>&nbsp;&nbsp;<a href="https://github.com/BlWasp"><img src="https://github.com/BlWasp.png" width="50px" alt="BlWasp" /></a>&nbsp;&nbsp;<a href="https://github.com/pl4nty"><img src="https://github.com/pl4nty.png" width="50px" alt="pl4nty" /></a>&nbsp;&nbsp;<a href="https://github.com/0xN0x"><img src="https://github.com/0xN0x.png" width="50px" alt="0xN0x" /></a>&nbsp;&nbsp;<a href="https://github.com/C3n7ral051nt4g3ncy"><img src="https://github.com/C3n7ral051nt4g3ncy.png" width="50px" alt="C3n7ral051nt4g3ncy" /></a>&nbsp;&nbsp;<a href="https://github.com/rayanlecat"><img src="https://github.com/rayanlecat.png" width="50px" alt="rayanlecat" /></a>&nbsp;&nbsp;<a href="https://github.com/ajmeese7"><img src="https://github.com/ajmeese7.png" width="50px" alt="ajmeese7" /></a>&nbsp;&nbsp;<a href="https://github.com/im-hanzou"><img src="https://github.com/im-hanzou.png" width="50px" alt="im-hanzou" /></a>&nbsp;&nbsp;<a href="https://github.com/gingeleski"><img src="https://github.com/gingeleski.png" width="50px" alt="gingeleski" /></a>&nbsp;&nbsp;<!-- sponsors -->
+<!-- sponsors --><a href="https://github.com/BlWasp"><img src="https://github.com/BlWasp.png" width="50px" alt="BlWasp" /></a>&nbsp;&nbsp;<a href="https://github.com/C3n7ral051nt4g3ncy"><img src="https://github.com/C3n7ral051nt4g3ncy.png" width="50px" alt="C3n7ral051nt4g3ncy" /></a>&nbsp;&nbsp;<a href="https://github.com/im-hanzou"><img src="https://github.com/im-hanzou.png" width="50px" alt="im-hanzou" /></a>&nbsp;&nbsp;<a href="https://github.com/gingeleski"><img src="https://github.com/gingeleski.png" width="50px" alt="gingeleski" /></a>&nbsp;&nbsp;<a href="https://github.com/ItsMalware"><img src="https://github.com/ItsMalware.png" width="50px" alt="ItsMalware" /></a>&nbsp;&nbsp;<!-- sponsors -->
 
 \
 You like my work ?\
